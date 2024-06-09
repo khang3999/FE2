@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./public/assets/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="./public/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./public/css/style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .wrap {
+            width: 100vw;
+            height: 100vh;
+            perspective: 800px;
+            position: fixed;
+        }
+
+        .bg {
+            transform-style: preserve-3d;
+            width: 100%;
+            height: 100%;
+            background: url(./public/images/milky_way.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: fixed;
+            scale: 1.3;
+            z-index: -1;
+        }
+
+        .parent {
+            transform-style: preserve-3d;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            transition: 0.5s ease-out;
+            transform-origin: 50% 50% -500px;
+        }
+
+        .btn-load-more {
+            position: absolute;
+        }
+
+        .card {
+            width: 200px;
+            height: auto;
+            position: absolute;
+            background-color: transparent;
+            transition: 0.5s ease-out;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            filter: brightness(120%) !important;
+            transform: translateZ(2px) !important;
+            box-shadow: 0px 0px 10px yellow;
+        }
+
+        .card-body {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="d-flex position-absolute">
+            <button class="btn-load-more z-2" onclick="createImage()">Load more</button>
+            <input class="form-control me-2 input-search mt-5" type="search" placeholder="Search" aria-label="Search"
+                name="q">
+        </div>
+        <div class="parent">
+
+        </div>
+        <div class="bg"></div>
+    </div>
+
+    <!-- Modal Body -->
+    <!-- if you want to close by clicking outside the modal, delete the last endpoint:data-bs-backdrop and data-bs-keyboard -->
+    <div class="modal fade" id="modalId" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
+        aria-labelledby="modalTitleId" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitleId">
+                        Modal title
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Body</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <!-- <script src="./public/js/script.js"></script> -->
+    <script>
+        const wrap = document.querySelector('.wrap');
+        const parent = document.querySelector('.parent');
+        const background = document.querySelector('.bg');
+        function createImage() {
+            console.log("tapppp");
+            for (let index = 0; index < 4; index++) {
+                let div = document.createElement('div')
+                div.innerHTML = `<div class="card">
+                <img class="card-img-top" src="./public/images/Desert.jpg" alt="">
+                <div class="card-body">
+                    <p class="text-light">
+                        <i class="bi bi-heart"></i>
+                        <span class="like-number">0</span>
+                    </p>      
+                    <p class="text-light">
+                        <i class="bi bi-eye-fill"></i>
+                        <span class="like-number">0</span>
+                    </p> 
+                </div>
+            </div>`
+
+                // Set vị trí
+                let card = div.firstElementChild
+                card.style.top = Math.floor(Math.random() * (70 - 10) + 5) + "%";
+                card.style.left = Math.floor(Math.random() * 80 + 5) + "%";
+
+                // Set modal
+                card.setAttribute('data-bs-toggle', 'modal')
+                card.setAttribute('data-bs-target', '#modalId')
+
+                // Phân chia tầng:
+                // index.floor
+                const floor = Math.random() * 0.6
+                card.style.transform = `translateZ(-${floor * 1000}px)`; // Từ 0 đến 500px vì max floor 0.5
+                // Set overplay
+                // const overlay = card.querySelector('.overplay')
+                // overlay.style.backgroundColor = `rgba(0, 0, 0, ${floor})`;
+                card.style.filter = `brightness(${(1 - floor) * 100 + 10}%)`;
+
+                parent.append(card)
+            }
+        }
+
+        wrap.addEventListener('mousemove', (event) => {
+            // Lay toa do chuot
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            // Tinh diem trung tam
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            // Tinh khoang cach tu diem chuot den tam
+            const deltaX = mouseX - centerX;
+            const deltaY = mouseY - centerY;
+
+            // Tinh goc xoay của parent
+            let rotateParentOy = -1 * (deltaX / centerX) * 30;
+            let rotateParentOx = (deltaY / centerY) * 30;
+            parent.style.transform = `rotateX(${rotateParentOx}deg) rotateY(${rotateParentOy}deg)`;
+
+            // Tinh goc xoay của background
+            let rotateBackgroundOy = -1 * (deltaX / centerX) * 5;
+            let rotateBackgroundOx = -1 * (deltaY / centerY) * 5;
+            background.style.transform = `rotateX(${rotateBackgroundOx}deg) rotateY(${rotateBackgroundOy}deg)`;
+
+        })
+    </script>
+</body>
+
+</html>
